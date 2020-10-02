@@ -17,6 +17,31 @@ import tensorflow  as tf
 from libs.configs import cfgs
 
 
+
+
+
+def generate_dataset(images, labels, batch_size, buffer_size=70000):
+
+    dataset = tf.data.Dataset.from_tensor_slices((images, labels))
+
+    dataset = dataset.map(lambda item1, item2: tf.numpy_function(image_process,
+                                                                 inp=[item1, item2],
+                                                                 Tout=[tf.float32, tf.float32]),
+                          num_parallel_calls=tf.data.experimental.AUTOTUNE)
+
+    dataset = dataset.shuffle(buffer_size=buffer_size).batch(batch_size)
+
+    return dataset
+
+
+def image_process(image, label):
+
+    image = (image/255.).astype('float32')
+    label = label.astype('float32')
+
+    return image, label
+
+
 def load_mnist():
     data_dir = os.path.join(cfgs.DATASET_PATH, "mnist")
     fd = open(os.path.join(data_dir, 'train-images-idx3-ubyte'))
@@ -54,6 +79,7 @@ def load_mnist():
     return x, y_vec
 
 
+
 def sample_label(num_label=10*10):
     label_vector = np.zeros((num_label , 10), dtype=np.float)
     for i in range(0 , num_label):
@@ -62,6 +88,20 @@ def sample_label(num_label=10*10):
     return label_vector
 
 if __name__ == "__main__":
-    load_mnist()
+
+    # dataset batch
+    images, labels = load_mnist()
+    dataset = generate_dataset(images, labels, batch_size=cfgs.BATCH_SIZE)
+    for image_batch, label_batch in dataset.take(1):
+        print(image_batch.shape, label_batch.shape)
+
+    # sample label
+    sample_label = sample_label()
+    print(sample_label)
+
+
+
+
+
 
 
