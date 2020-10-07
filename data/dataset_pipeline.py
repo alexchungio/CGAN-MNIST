@@ -17,9 +17,6 @@ import tensorflow  as tf
 from libs.configs import cfgs
 
 
-
-
-
 def generate_dataset(images, labels, batch_size, buffer_size=70000):
 
     dataset = tf.data.Dataset.from_tensor_slices((images, labels))
@@ -29,7 +26,7 @@ def generate_dataset(images, labels, batch_size, buffer_size=70000):
                                                                  Tout=[tf.float32, tf.float32]),
                           num_parallel_calls=tf.data.experimental.AUTOTUNE)
 
-    dataset = dataset.shuffle(buffer_size=buffer_size).batch(batch_size)
+    dataset = dataset.shuffle(buffer_size=buffer_size).batch(batch_size, drop_remainder=True)
 
     return dataset
 
@@ -77,7 +74,6 @@ def load_mnist():
         y_vec[i, int(y[i])] = 1.0
 
     return x, y_vec
-
 
 
 def sample_label(num_label=10*10):
