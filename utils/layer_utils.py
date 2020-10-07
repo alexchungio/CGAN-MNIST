@@ -21,11 +21,11 @@ class ConvConcat(tf.keras.layers.Layer):
     def build(self, axis):
         pass
 
-    def call(self, x, y):
-        x_shape = array_ops.shape(x)
-        y_shape = array_ops.shape(y)
+    def call(self, inputs):
+        x_shape = inputs[0].get_shape()
+        y_shape = inputs[1].get_shape()
 
-        z = tf.keras.layers.concatenate([x, y * tf.ones([x_shape[:2] + [y_shape[3]]])],
+        z = tf.keras.layers.concatenate([inputs[0], inputs[1] * tf.ones(x_shape[:3] + [y_shape[3]])],
                                          axis=self.axis)
 
         return z

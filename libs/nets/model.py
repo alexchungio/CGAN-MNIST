@@ -67,7 +67,7 @@ class Generator(tf.keras.Model):
         self.conv_trans3 = tf.keras.layers.Conv2DTranspose(filters=1, kernel_size=(3, 3), strides=(2, 2),
                                                            padding='same', use_bias=True, activation='sigmoid')
 
-    def call(self, z, y):
+    def call(self, z, y, training=False):
         """
 
         :param noise: (batch_size, z_dim)
@@ -121,7 +121,6 @@ class Generator(tf.keras.Model):
         return model
 
 
-
 class Discriminator(tf.keras.Model):
     def __init__(self, y_dim, dropout_rate=0.0):
         super(Discriminator, self).__init__()
@@ -160,12 +159,12 @@ class Discriminator(tf.keras.Model):
         self.dropout3 = tf.keras.layers.Dropout(rate=dropout_rate)
 
         # ((-1, 1024), (-1, 10)) => (-1, 1024+10)
-        self.concat2 = tf.keras.layers.concatenate(axis=-1)
+        self.concat2 = tf.keras.layers.Concatenate(axis=-1)
 
         # (-1, 1024) => (-1, 1)
         self.fc2 = tf.keras.layers.Dense(units=1)
 
-    def call(self, x, y):
+    def call(self, x, y, training=False):
         """
 
         :param image: (-1, 28, 28, 1)
@@ -175,37 +174,37 @@ class Discriminator(tf.keras.Model):
         # (-1, 1, 1, 10)
         expend_y = self.reshape1(y)
         # (-1, 28, 28, 11)
-        x = self.conv_concat1(x, expend_y)
+        x = self.conv_concat1((x, expend_y))
 
         # conv block 1 (-1, 28, 28, 11) => (-1, 14, 14, 10)
         model = self.conv1(x)
         model = self.bn1(model)
         model = self.leak_relu1(model)
-        model = self.dropout1(model)
+        model = self.dropout1(model, training=training)
 
         # (-1, 14, 14, 20)
-        model = self.conv_concat2(model, expend_y)
+        model = self.conv_concat2((model, expend_y))
 
         # conv block 2 (-1, 14, 14, 20) => (-1,7, 7, 64)
         model = self.conv2(model)
         model = self.bn2(model)
         model = self.leak_relu2(model)
-        model = self.dropout2(model)
+        model = self.dropout2(model, training=training)
 
         # reshape (-1, 7*7*64)
         model = self.flatten1(model)
 
         # concat 1 (-1, 7*7*64 +10)
-        model = self.concat1(model, y)
+        model = self.concat1((model, y))
 
         # fc1 (-1, 1024)
         model = self.fc1(model)
         model = self.bn3(model)
         model = self.leak_relu3(model)
-        model = self.dropout3(model)
+        model = self.dropout3(model, training=training)
 
         # concat 1 (-1, 1024 +10)
-        model = self.concat2(model, y)
+        model = self.concat2((model, y))
 
         # fc2
         model = self.fc2(model)
