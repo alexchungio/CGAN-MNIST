@@ -13,6 +13,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from utils.tools import makedir
 
 
 def get_image(image_path , is_grayscale = False):
@@ -29,6 +30,7 @@ def imread(path, is_grayscale = False):
         return plt.imread(path).astype(np.float)
 
 def imsave(images , size , path):
+    makedir(os.path.dirname(path))
     return plt.imsave(path , merge(images , size))
 
 def merge(images , size):
