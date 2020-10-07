@@ -22,7 +22,7 @@ python download.py mnist
 
 ```
 
-## Train logs
+## Train Logs
 
 ```
 dropout_rate = 0.3
@@ -39,5 +39,11 @@ Displayed generator Loss on Tensorboard | Displayed discriminator Loss on Tensor
 |:-------------------------:|
 every epoch generator result of training | 
 
+
+## TOTO
+
+
 ## Reference code
 * <https://github.com/zhangqianhui/Conditional-GAN>
+
+
