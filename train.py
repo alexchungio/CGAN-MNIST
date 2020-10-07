@@ -17,6 +17,7 @@ from libs.configs import cfgs
 from data.dataset_pipeline import load_mnist, generate_dataset, sample_label
 from libs.nets.model import Generator, Discriminator
 from utils.image_utils import save_images
+from utils.tools import generate_gif
 
 generator = Generator(cfgs.Y_DIM)
 discriminator = Discriminator(y_dim=cfgs.Y_DIM, dropout_rate=cfgs.DROPOUT_RATE)
@@ -168,14 +169,22 @@ def train(dataset, epochs):
                     image_path=os.path.join(cfgs.IMAGE_SAVE_PATH, 'epoch_{:04d}.png'.format(epoch)))
 
 
+def test():
+    pass
+
+
+def visual():
+    pass
+
+
 def main():
     # load mnist
     images, labels = load_mnist()
     dataset = generate_dataset(images, labels, batch_size=cfgs.BATCH_SIZE)
     train(dataset, cfgs.NUM_EPOCH)
 
-    # generate_gif(image_path=cfgs.IMAGE_SAVE_PATH,
-    #              anim_file=os.path.join(cfgs.IMAGE_SAVE_PATH, 'dcgan_mnist_dropout_05.gif'))
+    generate_gif(image_path=cfgs.IMAGE_SAVE_PATH,
+                 anim_file=os.path.join(cfgs.IMAGE_SAVE_PATH, 'dcgan_mnist_dropout_03.gif'))
 
 
 if __name__ == "__main__":
